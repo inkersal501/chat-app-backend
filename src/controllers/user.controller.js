@@ -17,4 +17,7 @@ const signIn = async (req, res) => {
     }
 };  
 
-export default { signUp, signIn };
+const profile = async (req, res) => {
+    res.status(200).send({"msg": "Profile succesfull."}); 
+};
+export default { signUp, signIn, profile };

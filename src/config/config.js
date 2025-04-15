@@ -18,7 +18,9 @@ const config = {
   jwt:{
     secret: process.env.JWTSECRET,
     expire: process.env.JWT_ACCESS_EXPIRATION_MINUTES
-  }
+  },
+  NodeEmail: process.env.NODE_EMAIL,
+  NodePassword: process.env.NODE_PASSWORD
 };
 
 export default config;
