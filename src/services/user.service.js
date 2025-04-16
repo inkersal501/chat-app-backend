@@ -47,4 +47,15 @@ const signIn = async (user) => {
     }
 };
 
-export default { signUp, signIn };
+const profile = async (user) => {
+    try {
+        const getUser = await userModel.findById(user._id).select('username email').lean();
+        if(!getUser)
+            throw new Error('User Not Found.');           
+        return getUser;
+    } catch (error) {
+        throw new Error(`${error.message}.`);
+    }
+};
+
+export default { signUp, signIn, profile };

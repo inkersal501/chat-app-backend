@@ -18,6 +18,11 @@ const signIn = async (req, res) => {
 };  
 
 const profile = async (req, res) => {
-    res.status(200).send({"msg": "Profile succesfull."}); 
+    try {
+        const result = await userService.profile(req.user);   
+        res.status(200).send({"msg": "Profile Fetch succesfull.", user: {...result}});
+    } catch (error) {
+        res.status(500).send({"msg": error.message});
+    } 
 };
 export default { signUp, signIn, profile };
