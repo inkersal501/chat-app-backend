@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import path from "path";
  
-dotenv.config({ path: path.join(process.cwd(), '.env') });
+dotenv.config({ path: path.join(process.cwd(), ".env") });
   
 if (!process.env.PORT || !process.env.MONGODB_URI) {
   throw new Error("Missing required environment variables: PORT or MONGODB_URI");

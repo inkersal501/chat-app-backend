@@ -1,4 +1,6 @@
 import userRoute from "./user.route.js";
+import connectRoute from "./connect.route.js";
+import { authMiddleware } from "../middlewares/index.js";
 
 export default function v1routes(app) {    
     app.use((req, res, next) => { 
@@ -6,4 +8,5 @@ export default function v1routes(app) {
         next();
     });
     app.use("/v1/user", userRoute);
+    app.use("/v1/connect", authMiddleware, connectRoute);
 } 

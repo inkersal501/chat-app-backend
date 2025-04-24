@@ -1,2 +1,7 @@
 import userController from "./user.controller.js";
-export {userController};
+import connectController from "./connect.controller.js";
+
+export { 
+    userController, 
+    connectController
+};

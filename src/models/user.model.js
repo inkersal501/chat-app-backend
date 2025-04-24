@@ -23,7 +23,25 @@ const userSchema = mongoose.Schema(
                     throw new Error("Password must contain at least one letter and one number");
                 }
             },
-        }
+        },
+        sentRequests: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User"
+            }
+        ],
+        receivedRequests: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User"
+            }
+        ],
+        friends: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User"
+            }
+        ]
     },
     {
         timestamps: true

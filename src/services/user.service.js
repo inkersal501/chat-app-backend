@@ -1,12 +1,12 @@
-import { User as userModel, Login as loginModel} from "../models/index.js"; 
+import { User as userModel, Login as loginModel } from "../models/index.js"; 
 import { tokenService } from "./index.js"; 
-import { transporter } from '../config/mailer.js';
+import { transporter } from "../config/mailer.js";
 
 const signUp = async (user) => { 
     const emailStatus = await userModel.findOne({email: user.email});
     if(!emailStatus) {
         if(user.password.length<8){
-            throw new Error("Signup Failed. Password must contain at least 8 characters.");
+            throw new Error("Signup failed. Password must contain at least 8 characters.");
         }else{
             try {
                 await userModel.create({...user});
@@ -35,27 +35,31 @@ const signIn = async (user) => {
         try {
             const getUser = await userModel.findOne({email});
             if(!getUser)
-                throw new Error('User Not Found.');         
+                throw new Error("User not found.");         
             if(getUser && !(await getUser.isPasswordMatch(password)))
-                throw new Error('Incorrect Password.');            
+                throw new Error("Incorrect password.");            
             const token = await tokenService.generateAuthTokens(getUser);    
             await loginModel.create({email, token})         
             return token;
         } catch (error) {
-            throw new Error(`SignIn Failed. ${error.message}.`);
+            throw new Error(`SignIn failed. ${error.message}.`);
         }
     }
 };
 
 const profile = async (user) => {
     try {
-        const getUser = await userModel.findById(user._id).select('username email').lean();
+        const getUser = await userModel.findById(user._id).select("username email").lean();
         if(!getUser)
-            throw new Error('User Not Found.');           
+            throw new Error("User not found.");           
         return getUser;
     } catch (error) {
         throw new Error(`${error.message}.`);
     }
 };
 
-export default { signUp, signIn, profile };
+export default { 
+    signUp, 
+    signIn, 
+    profile 
+};
