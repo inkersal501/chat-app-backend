@@ -44,13 +44,35 @@ const acceptRequest = async (fromUserId, currUserId) => {
 
 const getFriends = async (currUserId) => {
 
-    const currUser = await User.findById(userId).populate("friends", "username email");
+    const currUser = await userModel.findById(userId).populate("friends", "username email");
     return currUser.friends;
     
+};
+
+const getSuggestions = async (currUserId) => {
+    try {
+        const currentUser = await userModel.findById(currUserId);
+    
+        const excludedUserIds = [
+          ...currentUser.friends,
+          ...currentUser.sentRequests,
+          ...currentUser.receivedRequests,
+          currentUser._id
+        ];
+    
+        const suggestedUsers = await userModel.find({
+          _id: { $nin: excludedUserIds }
+        }).select('_id username email'); 
+    
+        return suggestedUsers;
+    } catch (error) {
+        throw new Error("Error fetching suggested users:"); 
+    }
 };
 
 export default {
     sendRequest,
     acceptRequest,
-    getFriends 
+    getFriends,
+    getSuggestions 
 };

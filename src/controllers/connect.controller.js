@@ -51,8 +51,22 @@ const getFriends = async (req, res) => {
 
 };
 
+const getSuggestions = async (req, res) => {
+    const currUserId = req.user._id;
+
+    try {
+        const list = await connectService.getSuggestions(currUserId);
+        if(list.length > 0)
+            res.status(200).send({ list });
+        else 
+            res.status(500).send({msg: "No users found."});
+    } catch (error) {
+        res.status(500).send({msg: error.message});
+    }
+};
 export default {
     sendRequest,
     acceptRequest,
-    getFriends 
+    getFriends,
+    getSuggestions
 };
