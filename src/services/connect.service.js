@@ -66,7 +66,25 @@ const getSuggestions = async (currUserId) => {
     
         return suggestedUsers;
     } catch (error) {
-        throw new Error("Error fetching suggested users:"); 
+        throw new Error("Error fetching suggested users."); 
+    }
+};
+
+const getRequests = async (currUserId) => {
+    try {
+        const currentUser = await userModel.findById(currUserId);
+    
+        const reqUserIds = [ 
+          ...currentUser.receivedRequests 
+        ];
+    
+        const reqUsers = await userModel.find({
+          _id: { $in: reqUserIds }
+        }).select('_id username email'); 
+    
+        return reqUsers;
+    } catch (error) {
+        throw new Error("Error fetching requested users."); 
     }
 };
 
@@ -74,5 +92,6 @@ export default {
     sendRequest,
     acceptRequest,
     getFriends,
-    getSuggestions 
+    getSuggestions,
+    getRequests 
 };

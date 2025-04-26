@@ -3,7 +3,7 @@ import { connectService } from "../services/index.js";
 const sendRequest = async (req, res) => {
 
     const currUserId = req.user._id;
-    const toUserId = req.param.toUserId;
+    const toUserId = req.params.toUserId;
 
     if(currUserId.toString()===toUserId){
         res.status(500).send({msg: "Cannot send request to yourself"});
@@ -11,7 +11,7 @@ const sendRequest = async (req, res) => {
         try {
             const status = await connectService.sendRequest(currUserId, toUserId);
             if(status)
-                res.status(200).send({msg: "Connect request sent."});
+                res.status(200).send({msg: "Friend request sent."});
         } catch (error) {
             res.status(500).send({msg: error.message});
         }
@@ -23,12 +23,12 @@ const sendRequest = async (req, res) => {
 const acceptRequest = async (req, res) => {
 
     const currUserId = req.user._id;
-    const fromUserId = req.param.fromUserId;
+    const fromUserId = req.params.fromUserId;
 
     try {
         const status = await connectService.acceptRequest(fromUserId, currUserId);
         if(status)
-            res.status(200).send({msg: "Connect request accepted."});
+            res.status(200).send({msg: "Friends request accepted."});
     } catch (error) {
         res.status(500).send({msg: error.message});
     }
@@ -64,9 +64,25 @@ const getSuggestions = async (req, res) => {
         res.status(500).send({msg: error.message});
     }
 };
+
+const getRequests = async (req, res) => {
+    const currUserId = req.user._id;
+
+    try {
+        const list = await connectService.getRequests(currUserId);
+        if(list.length > 0)
+            res.status(200).send({ list });
+        else 
+            res.status(500).send({msg: "No requests found."});
+    } catch (error) {
+        res.status(500).send({msg: error.message});
+    }
+};
+
 export default {
     sendRequest,
     acceptRequest,
     getFriends,
-    getSuggestions
+    getSuggestions,
+    getRequests
 };
