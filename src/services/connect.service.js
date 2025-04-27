@@ -24,17 +24,18 @@ const sendRequest = async (currUserId, toUserId) => {
 
 const acceptRequest = async (fromUserId, currUserId) => {
 
-    const fromUser = await userModel.findById(fromuserId);
+    const fromUser = await userModel.findById(fromUserId);
     const currUser = await userModel.findById(currUserId);
   
-    if(!currUser.receivedRequests.includes(fromuserId))
+    if(!currUser.receivedRequests.includes(fromUserId))
         throw new Error("No request found.");
     
+    console.log(fromUser.sentRequests)
     fromUser.sentRequests = fromUser.sentRequests.filter((id)=>id!==currUserId);
-    currUser.receivedRequests = currUser.receivedRequests.filter((id)=>id!==fromuserId);
+    currUser.receivedRequests = currUser.receivedRequests.filter((id)=>id!==fromUserId);
     
     fromUser.friends.push(currUserId);
-    currUser.friends.push(fromuserId);
+    currUser.friends.push(fromUserId);
 
     await fromUser.save();
     await currUser.save();
@@ -44,7 +45,7 @@ const acceptRequest = async (fromUserId, currUserId) => {
 
 const getFriends = async (currUserId) => {
 
-    const currUser = await userModel.findById(userId).populate("friends", "username email");
+    const currUser = await userModel.findById(currUserId).populate("friends", "_id username email");
     return currUser.friends;
     
 };
