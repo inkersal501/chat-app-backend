@@ -39,8 +39,9 @@ const signIn = async (user) => {
             if(getUser && !(await getUser.isPasswordMatch(password)))
                 throw new Error("Incorrect password.");            
             const token = await tokenService.generateAuthTokens(getUser);    
-            await loginModel.create({email, token})         
-            return token;
+            await loginModel.create({email, token})  
+            const { username } = getUser; 
+            return {username, email, token};
         } catch (error) {
             throw new Error(`SignIn failed. ${error.message}.`);
         }

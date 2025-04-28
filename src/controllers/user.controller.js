@@ -12,7 +12,7 @@ const signUp = async (req, res) => {
 const signIn = async (req, res) => {
     try {
         const result = await userService.signIn(req.body);   
-        res.status(200).send({msg: "SignIn succesfull.", token: result});
+        res.status(200).send({msg: "SignIn succesfull.", user: result});
     } catch (error) {
         res.status(500).send({msg: error.message});
     }
