@@ -28,7 +28,7 @@ const acceptRequest = async (req, res) => {
     try {
         const status = await connectService.acceptRequest(fromUserId, currUserId);
         if(status)
-            res.status(200).send({msg: "Friends request accepted."});
+            res.status(200).send({msg: "Friend request accepted."});
     } catch (error) {
         res.status(500).send({msg: error.message});
     }
@@ -40,9 +40,9 @@ const getFriends = async (req, res) => {
     const currUserId = req.user._id;
 
     try {
-        const friends = await connectService.getFriends(currUserId);
-        if(friends.length > 0)
-            res.status(200).send({ friends });
+        const list = await connectService.getFriends(currUserId);
+        if(list.length > 0)
+            res.status(200).send({ list });
         else 
             res.status(500).send({msg: "No friends found."});
     } catch (error) {

@@ -30,15 +30,14 @@ const acceptRequest = async (fromUserId, currUserId) => {
     if(!currUser.receivedRequests.includes(fromUserId))
         throw new Error("No request found.");
     
-    console.log(fromUser.sentRequests)
-    fromUser.sentRequests = fromUser.sentRequests.filter((id)=>id!==currUserId);
-    currUser.receivedRequests = currUser.receivedRequests.filter((id)=>id!==fromUserId);
+    fromUser.sentRequests = fromUser.sentRequests.filter((id)=>id.toString()!==currUserId.toString());
+    currUser.receivedRequests = currUser.receivedRequests.filter((id)=>id.toString()!==fromUserId.toString());
     
     fromUser.friends.push(currUserId);
     currUser.friends.push(fromUserId);
 
     await fromUser.save();
-    await currUser.save();
+    await currUser.save(); 
 
     return true;
 };
