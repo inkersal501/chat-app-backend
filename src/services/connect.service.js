@@ -42,6 +42,24 @@ const acceptRequest = async (fromUserId, currUserId) => {
     return true;
 };
 
+const declineRequest = async (fromUserId, currUserId) => {
+
+    const fromUser = await userModel.findById(fromUserId);
+    const currUser = await userModel.findById(currUserId);
+  
+    if(!currUser.receivedRequests.includes(fromUserId))
+        throw new Error("No request found.");
+    
+    fromUser.sentRequests = fromUser.sentRequests.filter((id)=>id.toString()!==currUserId.toString());
+    currUser.receivedRequests = currUser.receivedRequests.filter((id)=>id.toString()!==fromUserId.toString());
+
+    await fromUser.save();
+    await currUser.save(); 
+
+    return true;
+};
+
+
 const getFriends = async (currUserId) => {
 
     const currUser = await userModel.findById(currUserId).populate("friends", "_id username email");
@@ -91,6 +109,7 @@ const getRequests = async (currUserId) => {
 export default {
     sendRequest,
     acceptRequest,
+    declineRequest,
     getFriends,
     getSuggestions,
     getRequests 

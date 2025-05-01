@@ -34,6 +34,20 @@ const acceptRequest = async (req, res) => {
     }
 
 };
+const declineRequest = async (req, res) => {
+
+    const currUserId = req.user._id;
+    const fromUserId = req.params.fromUserId;
+
+    try {
+        const status = await connectService.declineRequest(fromUserId, currUserId);
+        if(status)
+            res.status(200).send({msg: "Friend request declined."});
+    } catch (error) {
+        res.status(500).send({msg: error.message});
+    }
+
+};
 
 const getFriends = async (req, res) => {
 
@@ -82,6 +96,7 @@ const getRequests = async (req, res) => {
 export default {
     sendRequest,
     acceptRequest,
+    declineRequest,
     getFriends,
     getSuggestions,
     getRequests
