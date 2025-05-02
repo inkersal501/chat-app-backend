@@ -1,70 +1,94 @@
-import { User as userModel } from "../models/index.js"; 
-
+import { Chat as chatModel, User as userModel } from "../models/index.js"; 
+ 
 const sendRequest = async (currUserId, toUserId) => {
 
-    const currUser = await userModel.findById(currUserId);
-    const toUser = await userModel.findById(toUserId);
+    try {       
+        const currUser = await userModel.findById(currUserId);
+        const toUser = await userModel.findById(toUserId);
 
-    if(!currUser || !toUser)
-        throw new Error("User not found.");
-    if(currUser.friends.includes(toUserId))
-        throw new Error("Already friends.");
-    if(currUser.sentRequests.includes(toUserId))
-        throw new Error("Request already sent.");
-    
-    currUser.sentRequests.push(toUserId);
-    toUser.receivedRequests.push(currUserId);
+        if(!currUser || !toUser)
+            throw new Error("User not found.");
+        if(currUser.friends.includes(toUserId))
+            throw new Error("Already friends.");
+        if(currUser.sentRequests.includes(toUserId))
+            throw new Error("Request already sent.");
+        
+        currUser.sentRequests.push(toUserId);
+        toUser.receivedRequests.push(currUserId);
 
-    await currUser.save();
-    await toUser.save();
+        await currUser.save();
+        await toUser.save();
 
-    return true;
+        return true;
+    }catch (error) {
+        throw new Error("Error sending request.");  
+    }
 
 };
 
 const acceptRequest = async (fromUserId, currUserId) => {
 
-    const fromUser = await userModel.findById(fromUserId);
-    const currUser = await userModel.findById(currUserId);
-  
-    if(!currUser.receivedRequests.includes(fromUserId))
-        throw new Error("No request found.");
+    try {       
+        const fromUser = await userModel.findById(fromUserId);
+        const currUser = await userModel.findById(currUserId);
     
-    fromUser.sentRequests = fromUser.sentRequests.filter((id)=>id.toString()!==currUserId.toString());
-    currUser.receivedRequests = currUser.receivedRequests.filter((id)=>id.toString()!==fromUserId.toString());
-    
-    fromUser.friends.push(currUserId);
-    currUser.friends.push(fromUserId);
+        if(!currUser.receivedRequests.includes(fromUserId))
+            throw new Error("No request found.");
+        
+        fromUser.sentRequests = fromUser.sentRequests.filter((id)=>id.toString()!==currUserId.toString());
+        currUser.receivedRequests = currUser.receivedRequests.filter((id)=>id.toString()!==fromUserId.toString());
+        
+        fromUser.friends.push(currUserId);
+        currUser.friends.push(fromUserId);
 
-    await fromUser.save();
-    await currUser.save(); 
+        await fromUser.save();
+        await currUser.save(); 
 
-    return true;
+        const isExistingChat = await chatModel.findOne({
+            participants: { $all: [fromUserId, currUserId], $size: 2 }
+        });
+        if(!isExistingChat) {
+            await chatModel.create({participants: [fromUserId, currUserId], lastMessage: null})
+        }    
+
+        return true;
+    } catch (error) {
+        throw new Error("Error accepting request.");  
+    }
+
 };
 
 const declineRequest = async (fromUserId, currUserId) => {
-
-    const fromUser = await userModel.findById(fromUserId);
-    const currUser = await userModel.findById(currUserId);
-  
-    if(!currUser.receivedRequests.includes(fromUserId))
-        throw new Error("No request found.");
     
-    fromUser.sentRequests = fromUser.sentRequests.filter((id)=>id.toString()!==currUserId.toString());
-    currUser.receivedRequests = currUser.receivedRequests.filter((id)=>id.toString()!==fromUserId.toString());
+    try {       
+        const fromUser = await userModel.findById(fromUserId);
+        const currUser = await userModel.findById(currUserId);
+    
+        if(!currUser.receivedRequests.includes(fromUserId))
+            throw new Error("No request found.");
+        
+        fromUser.sentRequests = fromUser.sentRequests.filter((id)=>id.toString()!==currUserId.toString());
+        currUser.receivedRequests = currUser.receivedRequests.filter((id)=>id.toString()!==fromUserId.toString());
 
-    await fromUser.save();
-    await currUser.save(); 
+        await fromUser.save();
+        await currUser.save(); 
 
-    return true;
+        return true;
+    } catch (error) {
+        throw new Error("Error declining request.");  
+    }
 };
 
 
 const getFriends = async (currUserId) => {
 
-    const currUser = await userModel.findById(currUserId).populate("friends", "_id username email");
-    return currUser.friends;
-    
+    try {       
+        const currUser = await userModel.findById(currUserId).populate("friends", "_id username email");
+        return currUser.friends;
+    } catch (error) {
+        throw new Error("Error fetching friends."); 
+    }  
+      
 };
 
 const getSuggestions = async (currUserId) => {

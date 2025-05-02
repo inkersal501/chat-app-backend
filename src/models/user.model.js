@@ -2,11 +2,11 @@ import mongoose from "mongoose";
 import validator from "validator";
 import bcrypt from "bcryptjs"; 
 
+export const userRef = { type: mongoose.Schema.Types.ObjectId, ref: "User" };
+
 const userSchema = mongoose.Schema(
     {
-        username: {
-            type: String, required: true, trim: true
-        },
+        username: { type: String, required: true, trim: true },
         email: {
             type: String, required: true, trim: true, lowercase: true,
             validate: {
@@ -24,28 +24,12 @@ const userSchema = mongoose.Schema(
                 }
             },
         },
-        sentRequests: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "User"
-            }
-        ],
-        receivedRequests: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "User"
-            }
-        ],
-        friends: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "User"
-            }
-        ]
+        sentRequests: [ userRef ],
+        receivedRequests: [ userRef ],
+        friends: [ userRef ],
+        blocked: [ userRef ] 
     },
-    {
-        timestamps: true
-    }
+    { timestamps: true }
 );
 
 userSchema.pre("save", async function (next) {
@@ -66,3 +50,4 @@ userSchema.methods.isPasswordMatch = async function (password) {
 
 const User = mongoose.model("User", userSchema, "users");
 export default User; 
+ 
