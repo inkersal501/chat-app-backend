@@ -5,7 +5,8 @@ const chatSchema = mongoose.Schema(
     { 
         participants: [ userRef ],
         lastMessage: { type: mongoose.Schema.Types.ObjectId, ref: "Message" },
-        lastMessageAt : { type: Date, default: Date.now }
+        lastMessageAt : { type: Date, default: Date.now },
+        isSelfChat : { type: Boolean, default: false }
     },
     { timestamps: true }
 );

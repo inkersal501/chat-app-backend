@@ -1,30 +1,32 @@
-import { User as userModel, Login as loginModel } from "../models/index.js"; 
+import { User as userModel, Login as loginModel, Chat as chatModel } from "../models/index.js"; 
 import { tokenService } from "./index.js"; 
 import { transporter } from "../config/mailer.js";
 
 const signUp = async (user) => { 
     const emailStatus = await userModel.findOne({email: user.email});
-    if(!emailStatus) {
-        if(user.password.length<8){
-            throw new Error("Signup failed. Password must contain at least 8 characters.");
-        }else{
-            try {
-                await userModel.create({...user});
-                await transporter.sendMail({
-                    from: '"ChatApp Support" <inkersal143@gmail.com>',
-                    to: user.email,
-                    subject: "Welcome to ChatApp 🎉",
-                    html: `<h3>Hi ${user.username},</h3><p>Thanks for signing up for ChatApp! 🎉<br/>We're glad to have you!</p>`
-                });
-                console.log("Welcome Mailto: "+ user.email);
-                return true;
-            } catch (error) {
-                throw new Error(`Signup failed. ${error.message}.`);
-            }  
-        }     
-    }else{
+    const userStatus = await userModel.findOne({username: user.username});
+    if(emailStatus)
         throw new Error("Email already exists.");
-    }
+    if(userStatus)
+        throw new Error("Username already exists.");
+    if(user.password.length<8)
+        throw new Error("Signup failed. Password must contain at least 8 characters.");
+
+    try {
+        const userData = await userModel.create({...user});
+        await chatModel.create({participants: [userData._id], lastMessage: null, isSelfChat: true})
+        await transporter.sendMail({
+            from: '"ChatApp Support" <inkersal143@gmail.com>',
+            to: user.email,
+            subject: "Welcome to ChatApp 🎉",
+            html: `<h3>Hi ${user.username},</h3><p>Thanks for signing up for ChatApp! 🎉<br/>We're glad to have you!</p>`
+        });
+        console.log("Welcome Mailto: "+ user.email);
+        return true;
+    } catch (error) {
+        throw new Error(`Signup failed. ${error.message}.`);
+    }  
+
 };
 
 const signIn = async (user) => {
@@ -40,8 +42,8 @@ const signIn = async (user) => {
                 throw new Error("Incorrect password.");            
             const token = await tokenService.generateAuthTokens(getUser);    
             await loginModel.create({email, token})  
-            const { username } = getUser; 
-            return {username, email, token};
+            const { username, _id } = getUser; 
+            return {_id, username, email, token};
         } catch (error) {
             throw new Error(`SignIn failed. ${error.message}.`);
         }

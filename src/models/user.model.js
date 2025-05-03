@@ -6,7 +6,7 @@ export const userRef = { type: mongoose.Schema.Types.ObjectId, ref: "User" };
 
 const userSchema = mongoose.Schema(
     {
-        username: { type: String, required: true, trim: true },
+        username: { type: String, required: true, trim: true, unique: true },
         email: {
             type: String, required: true, trim: true, lowercase: true,
             validate: {
