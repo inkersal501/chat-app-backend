@@ -24,16 +24,7 @@ const getChatList = async (currUserId) => {
     
 };
 
-const getMessages = async (chatId) => {
-    try {     
-        const messages = await messageModel.find({ chat: chatId }).populate("sender", "username");
-        return messages;
-    } catch (error) {
-        throw new Error("Error fetching messages."); 
-    }        
-};
-
+ 
 export default {
-    getChatList,
-    getMessages
+    getChatList 
 };
