@@ -26,4 +26,13 @@ const profile = async (req, res) => {
         res.status(500).send({msg: error.message});
     } 
 };
-export default { signUp, signIn, profile };
+const updateUsername = async (req, res) => {
+    try {       
+        const result = await userService.updateUsername(req.user, req.body.username);
+        res.status(200).send({msg: "Username updated", user: {...result}});
+    } catch (error) {
+        res.status(500).send({msg: error.message});
+    }
+};
+
+export default { signUp, signIn, profile, updateUsername };

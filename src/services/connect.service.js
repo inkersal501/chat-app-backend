@@ -84,7 +84,23 @@ const getFriends = async (currUserId) => {
 
     try {       
         const currUser = await userModel.findById(currUserId).populate("friends", "_id username email");
-        return currUser.friends;
+
+        const friends = await Promise.all(
+            currUser.friends.map(async (friend) => {
+                const chat = await chatModel.findOne({
+                    participants: { $all: [currUserId, friend._id] },
+                    // isGroupChat: false
+                });
+
+                return {
+                    _id: friend._id,
+                    username: friend.username,
+                    email: friend.email,
+                    chatId: chat ? chat._id : null
+                };
+            })
+        );
+        return friends;
     } catch (error) {
         throw new Error("Error fetching friends."); 
     }  

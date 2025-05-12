@@ -61,8 +61,32 @@ const profile = async (user) => {
     }
 };
 
+const updateUsername = async (user, newUsername) => {
+  
+    const currUser = await userModel.findById(user._id); 
+    if(!currUser)
+        throw new Error("User not found.");    
+
+    if(newUsername !== currUser.username){
+        const userStatus = await userModel.findOne({username: newUsername});
+        if(userStatus)
+                throw new Error("Username already exists. use other username.");
+        try { 
+            currUser.username = newUsername;
+            await currUser.save();
+        } catch (error) {
+            throw new Error("Error updating username.");
+        }
+    } 
+
+    const {_id, username, email} = currUser; 
+    return {_id, username, email}; 
+    
+};
+
 export default { 
     signUp, 
     signIn, 
-    profile 
+    profile,
+    updateUsername 
 };
