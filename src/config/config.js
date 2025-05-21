@@ -17,7 +17,8 @@ const config = {
     expire: process.env.JWT_ACCESS_EXPIRATION_MINUTES
   },
   NodeEmail: process.env.NODE_EMAIL,
-  NodePassword: process.env.NODE_PASSWORD
+  NodePassword: process.env.NODE_PASSWORD,
+  appURL: process.env.APP_URL,
 };
 
 export default config;

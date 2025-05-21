@@ -1,6 +1,7 @@
 import { User as userModel, Login as loginModel, Chat as chatModel } from "../models/index.js"; 
+import welcomeEmail from "./email.service.js";
 import { tokenService } from "./index.js"; 
-import { transporter } from "../config/mailer.js";
+
 
 const signUp = async (user) => { 
     const emailStatus = await userModel.findOne({email: user.email});
@@ -14,14 +15,10 @@ const signUp = async (user) => {
 
     try {
         const userData = await userModel.create({...user});
-        await chatModel.create({participants: [userData._id], lastMessage: null, isSelfChat: true})
-        await transporter.sendMail({
-            from: '"ChatApp Support" <inkersal143@gmail.com>',
-            to: user.email,
-            subject: "Welcome to ChatApp 🎉",
-            html: `<h3>Hi ${user.username},</h3><p>Thanks for signing up for ChatApp! 🎉<br/>We're glad to have you!</p>`
-        });
-        console.log("Welcome Mailto: "+ user.email);
+        await chatModel.create({participants: [userData._id], lastMessage: null, isSelfChat: true})    
+        const welcome = welcomeEmail(userData);   
+        console.log(welcome?"Welcome Mailto: "+ user.email:"Error sending welcome :"+welcome);
+
         return true;
     } catch (error) {
         throw new Error(`Signup failed. ${error.message}.`);
