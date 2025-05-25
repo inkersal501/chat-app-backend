@@ -8,7 +8,7 @@ import jwtStrategy from "./config/passport.js";
 import passport from "passport";
 import http from "http";
 import { Server } from "socket.io";
- 
+
 const app = express();
 const port = 8082; 
 const DB_URL = config.mongoose.url;
@@ -27,7 +27,7 @@ v1routes(app);
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin : ['http://localhost:5173'],
+    origin : [config.appURL],
     methods: ["GET", "POST"],
   }
 });
