@@ -16,7 +16,7 @@ const router = express.Router();
 
 app.use(express.json());
 app.use(compression());
-app.use(cors());
+app.use(cors({origin: '*'}));
 app.use(passport.initialize());
 passport.use("jwt", jwtStrategy);
 
