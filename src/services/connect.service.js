@@ -120,7 +120,7 @@ const getSuggestions = async (currUserId) => {
     
         const suggestedUsers = await userModel.find({
           _id: { $nin: excludedUserIds }
-        }).select('_id username email'); 
+        }).select('_id username'); 
     
         return suggestedUsers;
     } catch (error) {
