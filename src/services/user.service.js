@@ -37,17 +37,17 @@ const signIn = async (user) => {
         try {
             const getUser = await userModel.findOne({email});
             if(!getUser)
-                throw new Error("User not found.");
+                throw new Error("SignIn failed. User not found.");
             if(getUser && getUser.isgoogleSignin)
-                throw new Error("Please signin using google.");
+                throw new Error("Please Continue signin with Google.");
             if(getUser && !(await getUser.isPasswordMatch(password)))
-                throw new Error("Incorrect password.");            
+                throw new Error("SignIn failed. Incorrect password.");            
             const token = await tokenService.generateAuthTokens(getUser, "access");   
             await loginModel.create({email, token});
             const { username, _id } = getUser; 
             return {_id, username, email, token};
         } catch (error) {
-            throw new Error(`SignIn failed. ${error.message}.`);
+            throw new Error(`${error.message}.`);
         }
     }
 };

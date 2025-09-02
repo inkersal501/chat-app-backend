@@ -17,7 +17,7 @@ const userSchema = mongoose.Schema(
             }
         },
         password: {
-            type: String, required: true, minLength: 8,
+            type: String, minLength: 8,
             validate(value) {
                 if (!value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
                     throw new Error("Password must contain at least one letter and one number");
@@ -27,7 +27,8 @@ const userSchema = mongoose.Schema(
         sentRequests: [ userRef ],
         receivedRequests: [ userRef ],
         friends: [ userRef ],
-        blocked: [ userRef ] 
+        blocked: [ userRef ],
+        isgoogleSignin: {type: Boolean, default:false} 
     },
     { timestamps: true }
 );
