@@ -37,7 +37,9 @@ const signIn = async (user) => {
         try {
             const getUser = await userModel.findOne({email});
             if(!getUser)
-                throw new Error("User not found.");         
+                throw new Error("User not found.");
+            if(getUser && getUser.isgoogleSignin)
+                throw new Error("Please signin using google.");
             if(getUser && !(await getUser.isPasswordMatch(password)))
                 throw new Error("Incorrect password.");            
             const token = await tokenService.generateAuthTokens(getUser, "access");   
@@ -60,7 +62,7 @@ const googleSignIn = async (idToken) => {
 
         let user = await userModel.findOne({email});
         if(!user) {
-            user = await userModel.create({email, username: name, googleId});
+            user = await userModel.create({email, username: name, isgoogleSignin : true});
         }
         const token = await tokenService.generateAuthTokens(user, "access");
         await loginModel.create({email, token}); 
