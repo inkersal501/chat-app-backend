@@ -3,11 +3,13 @@ import tokenService from "./token.service.js";
 import connectService from "./connect.service.js";
 import chatService from "./chat.service.js";
 import messageService from "./message.service.js";
+import analyticsService from "./analytics.service.js";
 
 export {
     userService, 
     tokenService,
     connectService,
     chatService,
-    messageService
+    messageService,
+    analyticsService
 };

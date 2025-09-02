@@ -19,6 +19,7 @@ const config = {
   NodeEmail: process.env.NODE_EMAIL,
   NodePassword: process.env.NODE_PASSWORD,
   appURL: process.env.APP_URL,
+  googleClientId: process.env.GOOGLE_CLIENT_ID,
 };
 
 export default config;

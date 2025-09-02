@@ -6,9 +6,9 @@ const generateToken = (userId, expires, type, secret = config.jwt.secret) => {
   return jwt.sign(payload, secret);
 };
 
-const generateAuthTokens = async (user) => {  
+const generateAuthTokens = async (user, tokenType) => {  
   const expiration = Math.floor(Date.now()/1000 + config.jwt.expire * 24 * 60 * 60);     
-  return generateToken(user._id, expiration, "access");  
+  return generateToken(user._id, expiration, tokenType);  
 };
   
 export default {

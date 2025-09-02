@@ -1,7 +1,10 @@
 import { User as userModel, Login as loginModel, Chat as chatModel } from "../models/index.js"; 
 import welcomeEmail from "./email.service.js";
 import { tokenService } from "./index.js"; 
+import {OAuth2Client} from "google-auth-library";
+import config from "../config/config.js";
 
+const google_client = new OAuth2Client(config.googleClientid);
 
 const signUp = async (user) => { 
     const emailStatus = await userModel.findOne({email: user.email});
@@ -37,13 +40,34 @@ const signIn = async (user) => {
                 throw new Error("User not found.");         
             if(getUser && !(await getUser.isPasswordMatch(password)))
                 throw new Error("Incorrect password.");            
-            const token = await tokenService.generateAuthTokens(getUser);    
-            await loginModel.create({email, token})  
+            const token = await tokenService.generateAuthTokens(getUser, "access");   
+            await loginModel.create({email, token});
             const { username, _id } = getUser; 
             return {_id, username, email, token};
         } catch (error) {
             throw new Error(`SignIn failed. ${error.message}.`);
         }
+    }
+};
+
+const googleSignIn = async (idToken) => {
+    try {
+        // console.log(config.googleClientId)
+        const ticket = await google_client.verifyIdToken({idToken, audience: config.googleClientId});
+        const payload = ticket.getPayload();
+        // console.log(payload)
+        const {email, name} =  payload;
+
+        let user = await userModel.findOne({email});
+        if(!user) {
+            user = await userModel.create({email, username: name, googleId});
+        }
+        const token = await tokenService.generateAuthTokens(user, "access");
+        await loginModel.create({email, token}); 
+        const { _id, username } = user; 
+        return {_id, username, email, token};
+    } catch (error) {
+        throw new Error(`Google SignIn failed. ${error.message}.`);
     }
 };
 
@@ -84,6 +108,7 @@ const updateUsername = async (user, newUsername) => {
 export default { 
     signUp, 
     signIn, 
+    googleSignIn,
     profile,
     updateUsername 
 };

@@ -8,6 +8,7 @@ import jwtStrategy from "./config/passport.js";
 import passport from "passport";
 import http from "http";
 import { Server } from "socket.io";
+// import cookieParser from "cookie-parser";
 
 const app = express();
 const port = 8082; 
@@ -16,6 +17,7 @@ const router = express.Router();
 
 app.use(express.json());
 app.use(compression());
+// app.use(cookieParser());
 app.use(cors({origin: '*'}));
 app.use(passport.initialize());
 passport.use("jwt", jwtStrategy);
