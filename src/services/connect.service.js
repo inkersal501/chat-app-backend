@@ -83,23 +83,28 @@ const declineRequest = async (fromUserId, currUserId) => {
 const getFriends = async (currUserId) => {
 
     try {       
-        const currUser = await userModel.findById(currUserId).populate("friends", "_id username email");
+        const currUser = await userModel.findById(currUserId).populate("friends", "_id username email"); 
+        if (!currUser) throw new Error("User not found");
 
-        const friends = await Promise.all(
-            currUser.friends.map(async (friend) => {
-                const chat = await chatModel.findOne({
-                    participants: { $all: [currUserId, friend._id] },
-                    // isGroupChat: false
-                });
+        const friendIds = currUser.friends.map((f) => f._id);
+        const chats = await chatModel.find({participants: { $in: friendIds, $all: [currUserId] } });
+        const chatMap = new Map();
+        chats.forEach((chat) => {
+            const otherId = chat.participants.find(
+                (id) => id.toString() !== currUserId.toString()
+            );
+            if (otherId) {
+                chatMap.set(otherId.toString(), chat._id);
+            }
+        });
 
-                return {
-                    _id: friend._id,
-                    username: friend.username,
-                    email: friend.email,
-                    chatId: chat ? chat._id : null
-                };
-            })
-        );
+        const friends = currUser.friends.map((friend) => ({
+            _id: friend._id,
+            username: friend.username,
+            email: friend.email,
+            chatId: chatMap.get(friend._id.toString()) || null,
+        }));        
+         
         return friends;
     } catch (error) {
         throw new Error("Error fetching friends."); 

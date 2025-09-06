@@ -9,6 +9,7 @@ import passport from "passport";
 import http from "http";
 import { Server } from "socket.io";
 // import cookieParser from "cookie-parser";
+import {messageService} from "./services/index.js";
 
 const app = express();
 const port = 8082; 
@@ -26,7 +27,9 @@ app.get('/', (req, res) => {
   res.send('Hello World!');
 });
 v1routes(app);
+
 const server = http.createServer(app);
+
 const io = new Server(server, {
   cors: {
     origin : [config.appURL],
@@ -41,7 +44,8 @@ io.on('connection', (socket) => {
     console.log(`User ${socket.id} joined room ${roomId}`);
   });
 
-  socket.on("send_message", ({ roomId, message }) => {
+  socket.on("send_message", async ({ roomId, message }) => {
+    await messageService.sendMessage(roomId, message.sender._id, message.content);
     io.to(roomId).emit("receive_message", message);
   });
 

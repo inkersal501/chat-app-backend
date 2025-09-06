@@ -9,7 +9,7 @@ const getMessages = async (chatId) => {
     }        
 };
 
-const sendMessage = async (chat, sender, content) => { 
+const sendMessage = async (chat, sender, content) => {
     
     try {
         const message = await messageModel.create({
@@ -20,7 +20,7 @@ const sendMessage = async (chat, sender, content) => {
             lastMessage: message._id,
             lastMessageAt: Date.now()
         });
-        return message;
+        return true;
     } catch (error) {
         throw new Error("Error sending message right now."); 
     }
