@@ -6,9 +6,9 @@ export const userRef = { type: mongoose.Schema.Types.ObjectId, ref: "User" };
 
 const userSchema = mongoose.Schema(
     {
-        username: { type: String, required: true, trim: true, unique: true },
+        username: { type: String, required: true, trim: true },
         email: {
-            type: String, required: true, trim: true, lowercase: true,
+            type: String, required: true, trim: true, lowercase: true, unique: true,
             validate: {
                 validator: value => validator.isEmail(value),
                 message: props=>{

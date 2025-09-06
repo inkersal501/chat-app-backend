@@ -18,8 +18,8 @@ const signUp = async (user) => {
 
     try {
         const userData = await userModel.create({...user});
-        await chatModel.create({participants: [userData._id], lastMessage: null, isSelfChat: true})    
-        const welcome = welcomeEmail(userData);   
+        await chatModel.create({participants: [userData._id], lastMessage: null, isSelfChat: true});    
+        const welcome = await welcomeEmail(userData);   
         console.log(welcome?"Welcome Mailto: "+ user.email:"Error sending welcome :"+welcome);
 
         return true;
@@ -53,16 +53,17 @@ const signIn = async (user) => {
 };
 
 const googleSignIn = async (idToken) => {
-    try {
-        // console.log(config.googleClientId)
+    try { 
         const ticket = await google_client.verifyIdToken({idToken, audience: config.googleClientId});
-        const payload = ticket.getPayload();
-        // console.log(payload)
+        const payload = ticket.getPayload(); 
         const {email, name} =  payload;
 
         let user = await userModel.findOne({email});
         if(!user) {
             user = await userModel.create({email, username: name, isgoogleSignin : true});
+            await chatModel.create({participants: [user._id], lastMessage: null, isSelfChat: true});    
+            const welcome = await welcomeEmail(user);   
+            console.log(welcome ? "Welcome Mailto: "+ email : "Error sending welcome :"+welcome);
         }
         const token = await tokenService.generateAuthTokens(user, "access");
         await loginModel.create({email, token}); 
