@@ -57,7 +57,7 @@ const getFriends = async (req, res) => {
     try {
         const list = await connectService.getFriends(currUserId);
         if(list.length > 0){
-            await client.set(`friends:${currUserId}`, JSON.stringify(list), 30);
+            await client.set(`friends:${currUserId}`, JSON.stringify(list), {EX: 30});
             console.log("Redis:SET Friends 30 seconds")
             res.json({ list });
         }
