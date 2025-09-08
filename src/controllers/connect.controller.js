@@ -1,5 +1,6 @@
+import client from "../redisClient.js";
 import { connectService } from "../services/index.js";
-
+ 
 const sendRequest = async (req, res) => {
 
     const currUserId = req.user._id;
@@ -11,7 +12,7 @@ const sendRequest = async (req, res) => {
         try {
             const status = await connectService.sendRequest(currUserId, toUserId);
             if(status)
-                res.status(200).send({msg: "Friend request sent."});
+                res.json({msg: "Friend request sent."});
         } catch (error) {
             res.status(500).send({msg: error.message});
         }
@@ -28,7 +29,7 @@ const acceptRequest = async (req, res) => {
     try {
         const status = await connectService.acceptRequest(fromUserId, currUserId);
         if(status)
-            res.status(200).send({msg: "Friend request accepted."});
+            res.json({msg: "Friend request accepted."});
     } catch (error) {
         res.status(500).send({msg: error.message});
     }
@@ -42,7 +43,7 @@ const declineRequest = async (req, res) => {
     try {
         const status = await connectService.declineRequest(fromUserId, currUserId);
         if(status)
-            res.status(200).send({msg: "Friend request declined."});
+            res.json({msg: "Friend request declined."});
     } catch (error) {
         res.status(500).send({msg: error.message});
     }
@@ -55,8 +56,11 @@ const getFriends = async (req, res) => {
 
     try {
         const list = await connectService.getFriends(currUserId);
-        if(list.length > 0)
-            res.status(200).send({ list });
+        if(list.length > 0){
+            await client.setEx(`friends:${currUserId}`, 30, JSON.stringify(list));
+            console.log("Redis:SET Friends 30 seconds")
+            res.json({ list });
+        }
         else 
             res.status(500).send({msg: "No friends found."});
     } catch (error) {
@@ -71,7 +75,7 @@ const getSuggestions = async (req, res) => {
     try {
         const list = await connectService.getSuggestions(currUserId);
         if(list.length > 0)
-            res.status(200).send({ list });
+            res.json({ list });
         else 
             res.status(500).send({msg: "No users found."});
     } catch (error) {
@@ -85,7 +89,7 @@ const getRequests = async (req, res) => {
     try {
         const list = await connectService.getRequests(currUserId);
         if(list.length > 0)
-            res.status(200).send({ list });
+            res.json({ list });
         else 
             res.status(500).send({msg: "No requests found."});
     } catch (error) {

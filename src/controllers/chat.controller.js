@@ -6,7 +6,7 @@ const getChatList = async (req, res) => {
         try {
             const list = await chatService.getChatList(currUserId);
             if(list.length > 0)
-                res.status(200).send({ list });
+                res.json({ list });
             else 
                 res.status(500).send({msg: "No chat found."});
         } catch (error) {

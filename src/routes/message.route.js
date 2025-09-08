@@ -1,6 +1,6 @@
-import express from "express";
+import {Router} from "express";
 import { messageController } from "../controllers/index.js";
-const router = express.Router();
+const router = Router();
  
 router.get("/:chatId", messageController.getMessages); 
 router.post("/send", messageController.sendMessage);
