@@ -20,6 +20,7 @@ const config = {
   NodePassword: process.env.NODE_PASSWORD,
   appURL: process.env.APP_URL,
   googleClientId: process.env.GOOGLE_CLIENT_ID,
+  redisURL: process.env.REDIS_URL
 };
 
 export default config;
