@@ -2,10 +2,11 @@ import passport from "passport";
 
 const verifyCallback = (req, res, resolve, reject) => (err, user, info) => {
     if(err || !user){
-        return res.status(401).send({ 
-            msg: "Unauthorized. Please login to continue."
-          });
-    }else{
+        // return res.status(401).send({ 
+        //     msg: "Unauthorized. Please login to continue."
+        // });
+        return res.redirect("/");
+    }else{ 
         req.user = user;
         resolve();
     }

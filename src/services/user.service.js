@@ -45,7 +45,7 @@ const signIn = async (user) => {
             const token = await tokenService.generateAuthTokens(getUser, "access");   
             await loginModel.create({email, token});
             const { username, _id } = getUser; 
-            return {_id, username, email, token};
+            return {details: {_id, username, email}, token};
         } catch (error) {
             throw new Error(`${error.message}.`);
         }
@@ -68,7 +68,7 @@ const googleSignIn = async (idToken) => {
         const token = await tokenService.generateAuthTokens(user, "access");
         await loginModel.create({email, token}); 
         const { _id, username } = user; 
-        return {_id, username, email, token};
+        return {details: {_id, username, email}, token};
     } catch (error) {
         throw new Error(`Google SignIn failed. ${error.message}.`);
     }
@@ -108,10 +108,17 @@ const updateUsername = async (user, newUsername) => {
     
 };
 
+const getSessUser = async (userId) => {
+    const user = await userModel.findById(userId).select("_id username email");
+    if(!user) throw new Error("User not found.");    
+    return user;
+};
+
 export default { 
     signUp, 
     signIn, 
     googleSignIn,
     profile,
-    updateUsername 
+    updateUsername,
+    getSessUser 
 };

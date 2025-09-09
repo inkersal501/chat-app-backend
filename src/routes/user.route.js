@@ -6,7 +6,10 @@ const router = Router();
 router.post("/signup", userController.signUp);
 router.post("/signin", userController.signIn);
 router.post("/google_signin", userController.googleSignIn);
-router.post("/profile", authMiddleware, userController.profile);
-router.patch("/username", authMiddleware, userController.updateUsername);
+
+router.use(authMiddleware);
+router.get("/me", userController.getSessUser);
+router.post("/profile", userController.profile);
+router.patch("/username", userController.updateUsername);
 
 export default router; 

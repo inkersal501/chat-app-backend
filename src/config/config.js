@@ -8,6 +8,7 @@ if (!process.env.PORT || !process.env.MONGODB_URI) {
 }
 
 const config = {
+  node_env : process.env.NODE_ENV,
   port: process.env.PORT || 5000,
   mongoose: {
     url: process.env.MONGODB_URI,

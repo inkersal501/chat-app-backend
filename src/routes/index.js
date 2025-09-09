@@ -13,7 +13,7 @@ export default function v1routes(app) {
     
     app.use("/v1/user", userRoute);
     app.use(authMiddleware);
-    app.use("/v1/connect", connectRoute);
+    app.use("/v1/connect", connectRoute); 
     app.use("/v1/chat", chatRoute);
     app.use("/v1/message", messageRoute);
     app.use("/v1/analytics", analyticsRoute);
