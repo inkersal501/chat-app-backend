@@ -20,7 +20,7 @@ const router = express.Router();
 app.use(express.json());
 app.use(compression());
 app.use(cookieParser());
-app.use(cors({origin: 'http://localhost:5173', credentials: true}));
+app.use(cors({origin: config.appURL, credentials: true}));
 app.use(passport.initialize());
 passport.use("jwt", jwtStrategy);
 
