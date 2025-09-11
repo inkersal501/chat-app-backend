@@ -71,4 +71,13 @@ const getSessUser = async (req, res) => {
     } 
 };
 
-export default { signUp, signIn, googleSignIn, profile, updateUsername, getSessUser };
+const logout = async (req, res) => {
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: config.node_env === "production",
+        sameSite: config.node_env === "production"?"none": "lax",
+    });
+  return res.json({ message: "Logged out successfully" });
+};
+
+export default { signUp, signIn, googleSignIn, profile, updateUsername, getSessUser, logout };

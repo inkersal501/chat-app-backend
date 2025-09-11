@@ -11,5 +11,5 @@ router.use(authMiddleware);
 router.get("/me", userController.getSessUser);
 router.post("/profile", userController.profile);
 router.patch("/username", userController.updateUsername);
-
+router.post("/logout", userController.logout);
 export default router; 
