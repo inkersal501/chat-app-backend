@@ -7,7 +7,11 @@ const generateToken = (userId, expires, type, secret = config.jwt.secret) => {
 };
 
 const generateAuthTokens = async (user, tokenType) => {  
-  const expiration = Math.floor(Date.now()/1000 + config.jwt.expire * 24 * 60 * 60);     
+  const lifetimeMinutes = Number(config.jwt.expire);
+  if (!Number.isFinite(lifetimeMinutes) || lifetimeMinutes <= 0) {
+    throw new Error("JWT access token lifetime must be a positive number of minutes.");
+  }
+  const expiration = Math.floor(Date.now() / 1000 + lifetimeMinutes * 60);
   return generateToken(user._id, expiration, tokenType);  
 };
   

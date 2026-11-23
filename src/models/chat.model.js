@@ -10,6 +10,8 @@ const chatSchema = mongoose.Schema(
     },
     { timestamps: true }
 );
+
+chatSchema.index({ participants: 1, lastMessageAt: -1 });
  
 const Chat = mongoose.model("Chat", chatSchema, "chat");
-export default Chat; 
+export default Chat;
