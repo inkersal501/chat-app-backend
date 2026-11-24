@@ -1,4 +1,5 @@
-import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
+import { Strategy as JwtStrategy } from "passport-jwt";
+import { sessionRevoked } from "../services/session.service.js";
 import config from "./config.js"; 
 import { User } from "../models/index.js"; 
  
@@ -15,11 +16,12 @@ const jwtOptions = {
   secretOrKey: config.jwt.secret,
   // jwtFromRequest : ExtractJwt.fromAuthHeaderAsBearerToken(),
   jwtFromRequest : cookieExtract,
+  passReqToCallback: true,
 };
  
-const jwtVerify = async (payload, done) => {
+const jwtVerify = async (req, payload, done) => {
   try {
-    if(payload.type !== "access"){
+    if (payload.type !== "access" || !Number.isFinite(payload.exp) || await sessionRevoked(cookieExtract(req))){
       return done(new Error("Invalid token type"));
     }
     const user = await User.findById(payload.id).select("_id username email").lean(); 

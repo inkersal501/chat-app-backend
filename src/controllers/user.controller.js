@@ -1,4 +1,5 @@
 import { userService } from "../services/index.js"; 
+import { revokeSession } from "../services/session.service.js";
 import config from "../config/config.js";
 
 const signUp = async (req, res) => {
@@ -72,6 +73,7 @@ const getSessUser = async (req, res) => {
 };
 
 const logout = async (req, res) => {
+    await revokeSession(req.cookies.token);
     res.clearCookie("token", {
         httpOnly: true,
         secure: config.node_env === "production",
