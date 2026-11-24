@@ -2,7 +2,6 @@ import { createHash, randomBytes } from "node:crypto";
 import { Router } from "express";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
-import * as oidc from "openid-client";
 import config from "../config/config.js";
 import { limitRequests } from "../middlewares/quota.middleware.js";
 import auth from "../middlewares/auth.middleware.js";
@@ -26,10 +25,17 @@ export const OidcTransaction = mongoose.model("OidcTransaction", new mongoose.Sc
     expiresAt: { type: Date, required: true, expires: 0 },
 }));
 
+let oidc;
 let discovery;
-function provider() {
-    discovery ??= oidc.discovery(settings.issuer, settings.clientId, settings.clientSecret, undefined, {
-        execute: [oidc.enableNonRepudiationChecks],
+async function oidcLibrary() {
+    oidc ??= await import("openid-client");
+    return oidc;
+}
+
+async function provider() {
+    const client = await oidcLibrary();
+    discovery ??= client.discovery(settings.issuer, settings.clientId, settings.clientSecret, undefined, {
+        execute: [client.enableNonRepudiationChecks],
     }).catch((error) => {
         discovery = undefined;
         throw error;
@@ -61,6 +67,7 @@ router.use((_req, res, next) => {
 
 async function start(req, res) {
     const client = await provider();
+    const oidc = await oidcLibrary();
     const key = randomBytes(32).toString("base64url");
     const verifier = oidc.randomPKCECodeVerifier();
     const state = oidc.randomState();
@@ -116,6 +123,7 @@ router.get("/callback", async (req, res) => {
 
         const callback = new URL(settings.redirect);
         callback.search = new URL(req.originalUrl, settings.redirect.origin).search;
+        const oidc = await oidcLibrary();
         const tokens = await oidc.authorizationCodeGrant(await provider(), callback, {
             pkceCodeVerifier: transaction.verifier,
             expectedNonce: transaction.nonce,
