@@ -17,7 +17,7 @@ const signUp = async (user) => {
         throw new Error("Signup failed. Password must contain at least 8 characters.");
 
     try {
-        const userData = await userModel.create({...user});
+        const userData = await userModel.create({ username: user.username, email: user.email, password: user.password });
         await chatModel.create({participants: [userData._id], lastMessage: null, isSelfChat: true});    
         const welcome = await welcomeEmail(userData);   
         console.log(welcome?"Welcome Mailto: "+ user.email:"Error sending welcome :"+welcome);

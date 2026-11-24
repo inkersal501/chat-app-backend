@@ -2,7 +2,9 @@ import { limitRequests } from "../middlewares/quota.middleware.js";
 import {Router} from "express";
 import { userController } from "../controllers/index.js"; 
 import { authMiddleware } from "../middlewares/index.js";
+import oidcRoute from "./oidc.route.js";
 const router = Router();
+router.use("/oidc", oidcRoute);
 
 const authQuotaKey = (req) => {
     const email = typeof req.body?.email === "string" ? req.body.email.trim().toLowerCase().slice(0, 254) : "";

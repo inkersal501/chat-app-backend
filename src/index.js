@@ -7,6 +7,7 @@ import http from "http";
 import cookieParser from "cookie-parser";
 import passport from "passport";
 import { Server } from "socket.io";
+import { OidcTransaction } from "./routes/oidc.route.js";
 import v1routes from "./routes/index.js";
 import config from "./config/config.js";
 import jwtStrategy from "./config/passport.js";
@@ -149,7 +150,7 @@ io.on("connection", (socket) => {
 });
 
 mongoose.connect(config.mongoose.url)
-  .then(() => Promise.all([Message, RequestQuota, SocialReaction, RevokedSession].map((model) => model.createIndexes())))
+  .then(() => Promise.all([Message, RequestQuota, SocialReaction, RevokedSession, ...(config.oidc ? [User, OidcTransaction] : [])].map((model) => model.createIndexes())))
   .then(() => {
     server.listen(port, () => console.log(`Convo API and realtime service listening on port ${port}`));
   })

@@ -24,6 +24,7 @@
     "mongoose": "^8.13.2",
     "nodemailer": "^6.10.1",
     "nodemon": "^3.1.9",
+    "openid-client": "^6.9.1",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "redis": "^5.8.2",
