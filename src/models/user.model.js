@@ -29,10 +29,17 @@ const userSchema = mongoose.Schema(
         friends: [ userRef ],
         blocked: [ userRef ],
         muted: [ userRef ],
+        oidcIssuer: { type: String, select: false },
+        oidcSubject: { type: String, select: false },
         isgoogleSignin: {type: Boolean, default:false} 
     },
     { timestamps: true }
 );
+
+userSchema.index({ oidcIssuer: 1, oidcSubject: 1 }, {
+    unique: true,
+    partialFilterExpression: { oidcIssuer: { $type: "string" }, oidcSubject: { $type: "string" } },
+});
 
 userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();
