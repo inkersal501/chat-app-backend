@@ -1,9 +1,10 @@
+import { randomUUID } from "node:crypto";
 import jwt from "jsonwebtoken";
 import config from "../config/config.js";
  
 const generateToken = (userId, expires, type, secret = config.jwt.secret) => { 
   const payload = { id: userId, exp: expires, type };  
-  return jwt.sign(payload, secret);
+  return jwt.sign(payload, secret, { jwtid: randomUUID() });
 };
 
 const generateAuthTokens = async (user, tokenType) => {  

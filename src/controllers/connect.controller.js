@@ -1,4 +1,3 @@
-import client from "../redisClient.js";
 import { connectService } from "../services/index.js";
  
 const sendRequest = async (req, res) => {
@@ -56,13 +55,7 @@ const getFriends = async (req, res) => {
 
     try {
         const list = await connectService.getFriends(currUserId);
-        if(list.length > 0){
-            await client.set(`friends:${currUserId}`, JSON.stringify(list), {EX: 30});
-            console.log("Redis:SET Friends 30 seconds")
-            res.json({ list });
-        }
-        else 
-            res.status(500).send({msg: "No friends found."});
+        res.json({ list });
     } catch (error) {
         res.status(500).send({msg: error.message});
     }
@@ -74,10 +67,7 @@ const getSuggestions = async (req, res) => {
 
     try {
         const list = await connectService.getSuggestions(currUserId);
-        if(list.length > 0)
-            res.json({ list });
-        else 
-            res.status(500).send({msg: "No users found."});
+        res.json({ list });
     } catch (error) {
         res.status(500).send({msg: error.message});
     }
@@ -88,10 +78,7 @@ const getRequests = async (req, res) => {
 
     try {
         const list = await connectService.getRequests(currUserId);
-        if(list.length > 0)
-            res.json({ list });
-        else 
-            res.status(500).send({msg: "No requests found."});
+        res.json({ list });
     } catch (error) {
         res.status(500).send({msg: error.message});
     }

@@ -1,8 +1,10 @@
+import { blockedPeers, requireContactAllowed } from "./privacy.service.js";
 import { Chat as chatModel, User as userModel } from "../models/index.js"; 
  
 const sendRequest = async (currUserId, toUserId) => {
 
     try {       
+        await requireContactAllowed(currUserId, toUserId);
         const currUser = await userModel.findById(currUserId);
         const toUser = await userModel.findById(toUserId);
 
@@ -29,6 +31,7 @@ const sendRequest = async (currUserId, toUserId) => {
 const acceptRequest = async (fromUserId, currUserId) => {
 
     try {       
+        await requireContactAllowed(fromUserId, currUserId);
         const fromUser = await userModel.findById(fromUserId);
         const currUser = await userModel.findById(currUserId);
     
@@ -83,10 +86,13 @@ const declineRequest = async (fromUserId, currUserId) => {
 const getFriends = async (currUserId) => {
 
     try {       
-        const currUser = await userModel.findById(currUserId).populate("friends", "_id username email"); 
+        const currUser = await userModel.findById(currUserId).populate("friends", "_id username");
         if (!currUser) throw new Error("User not found");
 
-        const friendIds = currUser.friends.map((f) => f._id);
+        const { excluded } = await blockedPeers(currUserId);
+        const visibleFriends = currUser.friends.filter((friend) =>
+            !excluded.some((id) => String(id) === String(friend._id)));
+        const friendIds = visibleFriends.map((f) => f._id);
         const chats = await chatModel.find({participants: { $in: friendIds, $all: [currUserId] } });
         const chatMap = new Map();
         chats.forEach((chat) => {
@@ -98,10 +104,9 @@ const getFriends = async (currUserId) => {
             }
         });
 
-        const friends = currUser.friends.map((friend) => ({
+        const friends = visibleFriends.map((friend) => ({
             _id: friend._id,
             username: friend.username,
-            email: friend.email,
             chatId: chatMap.get(friend._id.toString()) || null,
         }));        
          
@@ -114,18 +119,19 @@ const getFriends = async (currUserId) => {
 
 const getSuggestions = async (currUserId) => {
     try {
-        const currentUser = await userModel.findById(currUserId);
+        const { viewer: currentUser, excluded } = await blockedPeers(currUserId);
     
         const excludedUserIds = [
           ...currentUser.friends,
           ...currentUser.sentRequests,
           ...currentUser.receivedRequests,
+          ...excluded,
           currentUser._id
         ];
     
         const suggestedUsers = await userModel.find({
           _id: { $nin: excludedUserIds }
-        }).select('_id username'); 
+        }).select('_id username').limit(25);
     
         return suggestedUsers;
     } catch (error) {
@@ -135,15 +141,15 @@ const getSuggestions = async (currUserId) => {
 
 const getRequests = async (currUserId) => {
     try {
-        const currentUser = await userModel.findById(currUserId);
+        const { viewer: currentUser, excluded } = await blockedPeers(currUserId);
     
         const reqUserIds = [ 
           ...currentUser.receivedRequests 
         ];
     
         const reqUsers = await userModel.find({
-          _id: { $in: reqUserIds }
-        }).select('_id username email'); 
+          _id: { $in: reqUserIds, $nin: excluded }
+        }).select('_id username');
     
         return reqUsers;
     } catch (error) {

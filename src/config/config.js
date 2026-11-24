@@ -8,6 +8,9 @@ if (!process.env.PORT || !process.env.MONGODB_URI) {
 }
 
 const config = {
+  moderatorIds: new Set((process.env.CONVO_MODERATOR_IDS || "").split(",").map((id) => id.trim()).filter(Boolean)),
+  feedEnabled: process.env.CONVO_FEED_ENABLED === "true" ||
+    (process.env.NODE_ENV !== "production" && process.env.CONVO_FEED_ENABLED !== "false"),
   node_env : process.env.NODE_ENV,
   port: process.env.PORT || 5000,
   mongoose: {

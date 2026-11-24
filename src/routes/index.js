@@ -1,3 +1,4 @@
+import socialRoute from "./social.route.js";
 import userRoute from "./user.route.js";
 import connectRoute from "./connect.route.js";
 import chatRoute  from "./chat.route.js";
@@ -7,12 +8,13 @@ import { authMiddleware } from "../middlewares/index.js";
 
 export default function v1routes(app) {    
     app.use((req, res, next) => { 
-        console.log(`${req.method} ${req.originalUrl}`); 
+        console.log(`${req.method} ${req.path}`);
         next();
     });
     
     app.use("/v1/user", userRoute);
     app.use(authMiddleware);
+    app.use("/v1/social", socialRoute);
     app.use("/v1/connect", connectRoute); 
     app.use("/v1/chat", chatRoute);
     app.use("/v1/message", messageRoute);

@@ -28,6 +28,7 @@ const userSchema = mongoose.Schema(
         receivedRequests: [ userRef ],
         friends: [ userRef ],
         blocked: [ userRef ],
+        muted: [ userRef ],
         isgoogleSignin: {type: Boolean, default:false} 
     },
     { timestamps: true }
